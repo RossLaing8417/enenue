@@ -1,0 +1,8 @@
+{
+    "test_http_endpoint": {
+        "module": "test_endpoint",
+        "http_endpoint": {
+            "path": "test-http-endpoint"
+        }
+    }
+}
