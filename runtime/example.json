@@ -1,8 +1,26 @@
 {
     "test_http_endpoint": {
-        "module": "test_endpoint",
+        "module_path": "./runtime/test_http_endpoint",
+        "settings": {
+            "dev": {
+                "url_value": "dev_value"
+            },
+            "test": {
+                "url_value": "test_value"
+            },
+            "prod": {
+                "url_value": "prod_value"
+            },
+            "default": {
+                "url_value": "default_value"
+            }
+        },
         "http_endpoint": {
-            "path": "test-http-endpoint"
+            "path": "test-http-endpoint",
+            "auth": {
+                "username": "test",
+                "password": "test"
+            }
         }
     }
 }

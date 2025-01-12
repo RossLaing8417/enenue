@@ -32,6 +32,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    addDependencies(b, exe_unit_tests, target, optimize);
+
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
     const test_step = b.step("test", "Run unit tests");

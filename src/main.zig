@@ -23,7 +23,7 @@ pub fn main() !void {
     zap.Log.fio_set_log_level(zap.Log.fio_log_level_info);
 
     var config = try Config.parseFile(allocator, "runtime/example.json", "dev");
-    defer config.deinit(allocator);
+    defer config.deinit();
 
     var endpoints = std.ArrayList(EndpointData).init(allocator);
     defer {
@@ -46,19 +46,23 @@ pub fn main() !void {
 
     var itr = config.interfaces.valueIterator();
     while (itr.next()) |interface| {
-        if (interface.node == .http_endpoint) {
-            try endpoints.append(.{
-                .endpoint = try InterfaceEndpoint.init(allocator, "eip", interface),
-                .auth = try Authenticator.init(allocator, &interface.auth, null),
-                .auth_endpoint = undefined,
-            });
-            const item = &endpoints.items[endpoints.items.len - 1];
-            item.auth_endpoint = AuthEndpoint.init(
-                item.endpoint.endpoint(),
-                &item.auth,
-            );
-            try listener.register(item.auth_endpoint.endpoint());
+        switch (interface.node) {
+            .http_endpoint => |*http_endpoint| {
+                try endpoints.append(.{
+                    .endpoint = try InterfaceEndpoint.init(allocator, "eip", interface),
+                    .auth = try Authenticator.init(allocator, &http_endpoint.auth, null),
+                    .auth_endpoint = undefined,
+                });
+                const item = &endpoints.items[endpoints.items.len - 1];
+                item.auth_endpoint = AuthEndpoint.init(
+                    item.endpoint.endpoint(),
+                    &item.auth,
+                );
+                try listener.register(item.auth_endpoint.endpoint());
+            },
+            else => {},
         }
+        if (interface.node == .http_endpoint) {}
     }
 
     try listener.listen();
@@ -90,3 +94,7 @@ pub extern fn fio_run_every(
     arg: ?*anyopaque,
     on_finish: ?*const fn (?*anyopaque) callconv(.C) void,
 ) c_int;
+
+test {
+    std.testing.refAllDecls(@This());
+}
